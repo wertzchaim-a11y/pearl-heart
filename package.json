@@ -1,0 +1,8 @@
+{
+  "name": "pearl-heart-program",
+  "version": "1.0.0",
+  "description": "Heart of The Pearl — Employee Recognition Program",
+  "dependencies": {
+    "airtable": "^0.12.2"
+  }
+}
