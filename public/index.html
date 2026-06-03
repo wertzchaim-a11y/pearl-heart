@@ -16,7 +16,7 @@
 
     /* PAGE 1 */
     .logo-wrap { text-align: center; padding: 2rem 0 1rem; }
-    .logo-wrap img { max-width: 180px; }
+    .logo-wrap img { max-width: 180px; mix-blend-mode: multiply; background: transparent; }
     .hero { text-align: center; padding: 0.5rem 0 1.75rem; }
     .hero h1 { font-size: 26px; font-weight: 800; color: #2C1810; line-height: 1.3; margin-bottom: 1rem; }
     .hero h1 em { font-style: normal; color: #C4806A; }
@@ -98,6 +98,14 @@
       <h1>Your words have the power to <em>change someone's day.</em></h1>
       <p class="lead">The nurses, aides, and caregivers at The Pearl show up every single day with compassion and dedication. When you recognize one of them, you're fueling the spirit that drives exceptional care for every resident in this building.</p>
     </div>
+    <button class="btn-main" onclick="goTo('page2')" style="margin-bottom:1rem;">Nominate a team member →</button>
+    <div class="raffle-banner" style="margin-bottom:1.5rem;">
+      <div class="rb-icon">🎁</div>
+      <div>
+        <h3>Monthly raffle — you could win!</h3>
+        <p>Every nomination enters you in our monthly prize draw. Leave a Google review too for a second chance to win.</p>
+      </div>
+    </div>
     <div class="impact-grid">
       <div class="impact-card"><div class="ic">💪</div><h3>Boosts morale</h3><p>Recognition improves staff motivation and retention</p></div>
       <div class="impact-card"><div class="ic">🏥</div><h3>Better care</h3><p>Recognized staff deliver measurably better outcomes</p></div>
@@ -108,14 +116,7 @@
       <p>"I had no idea how much that one message meant to me. I read it three times. It reminded me why I chose this work."</p>
       <cite>— A Pearl team member, after receiving a nomination</cite>
     </div>
-    <div class="raffle-banner">
-      <div class="rb-icon">🎁</div>
-      <div>
-        <h3>Monthly raffle — you could win!</h3>
-        <p>Every nomination enters you in our monthly prize draw. Leave a Google review too for a second chance to win.</p>
-      </div>
-    </div>
-    <button class="btn-main" onclick="goTo('page2')">Nominate a team member →</button>
+
     <p class="footer">The Pearl Nursing Center of Rochester &nbsp;·&nbsp; Heart of The Pearl Program</p>
   </div>
 
@@ -251,19 +252,37 @@
     function openGoogle() {
       document.getElementById('overlay').classList.add('show');
       document.getElementById('doubleBlock').style.animation = 'none';
-      window.open('https://maps.app.goo.gl/365aU1XGzynj2nBP9', '_blank');
     }
     function dismissPopup() {
       document.getElementById('overlay').classList.remove('show');
       document.getElementById('googleBtn').style.display = 'none';
       document.getElementById('cameBackBtn').style.display = 'flex';
+      window.open('https://maps.app.goo.gl/365aU1XGzynj2nBP9', '_blank');
     }
     function showBonusForm() {
       document.getElementById('cameBackBtn').style.display = 'none';
       document.getElementById('bonusForm').style.display = 'block';
     }
-    function claimBonus() {
+    async function claimBonus() {
       if (!document.getElementById('reviewCheck').checked) { alert('Please check the box to confirm.'); return; }
+      const btn = document.querySelector('#bonusForm .btn-main');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+      try {
+        await fetch('/api/nominate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            empName: 'GOOGLE REVIEW BONUS',
+            message: 'This person left a Google review and claimed a bonus raffle entry.',
+            nomName: document.getElementById('nomName') ? document.getElementById('nomName').value.trim() : '',
+            phone: document.getElementById('phone') ? document.getElementById('phone').value.trim() : '',
+            dept: 'Google Review',
+            rating: 5,
+            date: new Date().toISOString()
+          })
+        });
+      } catch {}
       document.querySelector('#bonusForm .btn-main').style.display = 'none';
       document.querySelector('.checkbox-row').style.display = 'none';
       document.getElementById('winnerMsg').style.display = 'block';
